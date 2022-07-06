@@ -36,6 +36,15 @@ class Query:
         user = await get_current_user(info)
         return user
 
+    @strawberry.mutation
+    def create_session(self, input: CreateSessionsInput) -> str:
+        user = authenticate_user(input.email, input.password)
+        if not user:
+            raise Exception("Invalid username or password")
+        token_expires = timedelta(minutes=1440)
+        token = create_access_token(user.email, user.id, expires_delta=token_expires)
+        return token
+
 
 @strawberry.type
 class Mutation:
@@ -50,14 +59,7 @@ class Mutation:
         db.commit()
         return True
 
-    @strawberry.mutation
-    def create_session(self, input: CreateSessionsInput) -> str:
-        user = authenticate_user(input.email, input.password)
-        if not user:
-            raise Exception("Invalid username or password")
-        token_expires = timedelta(minutes=1440)
-        token = create_access_token(user.email, user.id, expires_delta=token_expires)
-        return token
+   
 
 
 def custom_context_dependency() -> str:

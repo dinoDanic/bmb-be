@@ -1,12 +1,14 @@
+from typing import Optional
 from pydantic import BaseModel
 import strawberry
 
 @strawberry.type
 class Account:
-    email: str
-    first_name: str
-    last_name: str
-    password: str
+    id: str
+    email: Optional[str]
+    first_name: Optional[str]
+    last_name: Optional[str]
+    password: Optional[str]
 
 @strawberry.input
 class CreateAccountInput:

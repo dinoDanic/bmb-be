@@ -1,12 +1,13 @@
 from xmlrpc.client import Boolean
 from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import strawberry
 from strawberry.fastapi import GraphQLRouter
 from database import db_session
 from datetime import timedelta
 import models
 from strawberry.types import Info
-from modules.auth.resolvers import IsAuthenticated, authenticate_user, create_access_token, current_user, get_password_hash
+from api.auth.resolvers import IsAuthenticated, authenticate_user, create_access_token, current_user, get_current_user, get_password_hash
 from schemas import Account, CreateAccountInput, CreateSessionsInput
 
 
@@ -14,11 +15,25 @@ db = db_session.session_factory()
 
 app = FastAPI()
 
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @strawberry.type
 class Query:
     @strawberry.field(permission_classes=[IsAuthenticated])
     async def me(self, info: Info) -> Account:
-        user = await current_user(info)
+        user = await get_current_user(info)
         return user
 
 
@@ -40,7 +55,7 @@ class Mutation:
         user = authenticate_user(input.email, input.password)
         if not user:
             raise Exception("Invalid username or password")
-        token_expires = timedelta(minutes=60)
+        token_expires = timedelta(minutes=1440)
         token = create_access_token(user.email, user.id, expires_delta=token_expires)
         return token
 

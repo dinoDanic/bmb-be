@@ -13,4 +13,8 @@ class AccountTable(Base):
     last_name = Column(String)
     hash_password = Column(String)
     active = Column(Boolean, default=True)
-    token = Column(String)
+
+class OrderTable(Base):
+    __tablename__ = "orders"
+    id = Column(Integer, primary_key=True, index=True)
+    

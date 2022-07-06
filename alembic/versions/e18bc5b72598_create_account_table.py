@@ -25,7 +25,6 @@ def upgrade() -> None:
         sa.Column('last_name', sa.String(), nullable=False),
         sa.Column('hash_password', sa.String(), nullable=False),
         sa.Column('active', sa.Boolean(), default=True),
-        sa.Column('token', sa.String(), nullable=True)
     )
 
 

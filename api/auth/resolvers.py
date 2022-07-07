@@ -30,7 +30,8 @@ async def get_current_user(info: Info) -> Account:
     token = request.headers['Authorization'].split(' ')[1]
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user: Account = db.query(models.AccountTable).where(models.AccountTable.token == token).first()
+        user_id: int = payload.get("user_id")
+        user: Account = db.query(models.AccountTable).where(models.AccountTable.id == user_id).first()
         return user 
     except JWTError:
         raise Exception("Not authorized")
